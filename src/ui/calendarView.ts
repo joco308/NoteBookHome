@@ -14,22 +14,26 @@ import {
 import type { Task } from '../domain/task';
 import { createElement } from './dom';
 import { subjectColor } from './subjectColor';
+import { readTaskId, writeTaskId } from './taskDrag';
 
 export interface CalendarViewOptions {
   readonly onSelectDate: (isoDate: string) => void;
   readonly onOpenTask: (taskId: string) => void;
+  readonly onMoveTask: (taskId: string, isoDate: string) => void;
 }
 
 export class CalendarView {
   private yearMonth: YearMonth;
   private selectedDate: string | null = null;
   private readonly tasksByDate = new Map<string, Task[]>();
+  private dropTarget: HTMLElement | null = null;
 
   public constructor(
     private readonly root: HTMLElement,
     private readonly options: CalendarViewOptions,
   ) {
     this.yearMonth = toYearMonth(todayParts());
+    this.attachDragAndDrop();
   }
 
   public setSelectedDate(isoDate: string): void {
@@ -52,6 +56,116 @@ export class CalendarView {
       }
     }
     this.render();
+  }
+
+  private attachDragAndDrop(): void {
+    this.root.addEventListener('dragstart', (event) => {
+      this.handleDragStart(event);
+    });
+    this.root.addEventListener('dragover', (event) => {
+      this.handleDragOver(event);
+    });
+    this.root.addEventListener('dragleave', (event) => {
+      this.handleDragLeave(event);
+    });
+    this.root.addEventListener('drop', (event) => {
+      this.handleDrop(event);
+    });
+    document.addEventListener('dragend', () => {
+      this.handleDragEnd();
+    });
+  }
+
+  private handleDragStart(event: DragEvent): void {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+    const chip = target.closest<HTMLElement>('.calendar__task-button');
+    if (chip === null) {
+      return;
+    }
+    const taskId = chip.dataset.taskId;
+    if (taskId === undefined) {
+      return;
+    }
+    chip.classList.add('calendar__task-button--dragging');
+    writeTaskId(event, taskId);
+  }
+
+  private handleDragOver(event: DragEvent): void {
+    const cell = this.findDateCell(event.target);
+    if (cell === null) {
+      return;
+    }
+    event.preventDefault();
+    if (event.dataTransfer !== null) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+    this.setDropTarget(cell);
+  }
+
+  private handleDragLeave(event: DragEvent): void {
+    const cell = this.dropTarget;
+    if (cell === null) {
+      return;
+    }
+    const related = event.relatedTarget;
+    if (related instanceof Node && cell.contains(related)) {
+      return;
+    }
+    this.clearDropTarget();
+  }
+
+  private handleDrop(event: DragEvent): void {
+    const cell = this.findDateCell(event.target);
+    if (cell === null) {
+      this.clearDropTarget();
+      return;
+    }
+    event.preventDefault();
+    const taskId = readTaskId(event);
+    const isoDate = cell.dataset.date;
+    this.clearDropTarget();
+    if (taskId === null || isoDate === undefined) {
+      return;
+    }
+    this.options.onMoveTask(taskId, isoDate);
+  }
+
+  private handleDragEnd(): void {
+    this.clearDropTarget();
+    const dragging = this.root.querySelectorAll('.calendar__task-button--dragging');
+    dragging.forEach((element) => {
+      element.classList.remove('calendar__task-button--dragging');
+    });
+  }
+
+  private findDateCell(target: EventTarget | null): HTMLElement | null {
+    if (!(target instanceof HTMLElement)) {
+      return null;
+    }
+    const cell = target.closest<HTMLElement>('.calendar__cell');
+    if (cell === null || cell.dataset.date === undefined) {
+      return null;
+    }
+    return cell;
+  }
+
+  private setDropTarget(cell: HTMLElement): void {
+    if (this.dropTarget === cell) {
+      return;
+    }
+    this.clearDropTarget();
+    this.dropTarget = cell;
+    cell.classList.add('calendar__cell--drop-target');
+  }
+
+  private clearDropTarget(): void {
+    if (this.dropTarget !== null) {
+      this.dropTarget.classList.remove('calendar__cell--drop-target');
+      this.dropTarget = null;
+    }
   }
 
   private render(): void {
@@ -129,7 +243,10 @@ export class CalendarView {
     if (isoDate === this.selectedDate) {
       classNames.push('calendar__cell--selected');
     }
-    const cell = createElement('div', { className: classNames.join(' ') });
+    const cell = createElement('div', {
+      className: classNames.join(' '),
+      attributes: { 'data-date': isoDate },
+    });
 
     // Botón transparente que cubre toda la celda: cualquier punto del día es clickeable.
     const dayButton = createElement('button', {
@@ -162,7 +279,12 @@ export class CalendarView {
     const button = createElement('button', {
       className: 'calendar__task-button',
       text: task.subject,
-      attributes: { type: 'button', title: `${task.subject}: ${task.description}` },
+      attributes: {
+        type: 'button',
+        draggable: 'true',
+        'data-task-id': task.id,
+        title: `${task.subject}: ${task.description}`,
+      },
     });
     button.style.setProperty('--task-color', subjectColor(task.subject));
     button.addEventListener('click', (event) => {

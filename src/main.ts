@@ -20,6 +20,7 @@ function bootstrap(): void {
     onDelete: (taskId) => {
       service.remove(taskId);
     },
+    onUpdate: (taskId, input) => service.update(taskId, input),
   });
 
   const dayPanel = new DayPanelView(dayPanelRoot, {
@@ -45,6 +46,9 @@ function bootstrap(): void {
     },
     onOpenTask: (taskId) => {
       dialog.open(service.find(taskId));
+    },
+    onMoveTask: (taskId, isoDate) => {
+      service.moveToDate(taskId, isoDate);
     },
   });
 

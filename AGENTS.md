@@ -39,3 +39,4 @@
 - Lee este archivo de directivas antes de iniciar cualquier tarea, y modificalo si es necesario.
 - Lee MEMORY.md para conocer el estado del proyecto y las decisiones tomadas. 
 - Mantén el código modular, legible y fácil de mantener.
+- Manten el diseño y estilo lee DESIGN.md

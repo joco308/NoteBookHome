@@ -3,32 +3,35 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: 1rem 1.25rem 1.25rem;
+  padding: var(--space-3);
   box-shadow: var(--shadow-sm);
 }
 
 .calendar__toolbar {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
 }
 
 .calendar__label {
   flex: 1;
   margin: 0;
   font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
   text-align: center;
 }
 
 .calendar__nav,
 .calendar__today {
   border: 1px solid var(--color-border);
-  background: var(--color-surface);
+  background: var(--color-surface-raised);
   color: var(--color-text);
   border-radius: var(--radius-md);
-  padding: 0.35rem 0.6rem;
+  padding: 0.35rem 0.7rem;
   line-height: 1;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
 }
 
 .calendar__nav:hover,
@@ -43,11 +46,13 @@
   gap: 4px;
 }
 
+/* Etiqueta técnica en mono para los días de la semana. */
 .calendar__weekday {
   text-align: center;
-  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-muted);
   padding: 0.25rem 0;
@@ -61,7 +66,7 @@
   padding: 0.3rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: #fbfbfe;
+  background: var(--color-surface-raised);
 }
 
 .calendar__cell--empty {
@@ -76,6 +81,13 @@
 
 .calendar__cell--selected {
   background: var(--color-primary-soft);
+  border-color: var(--color-border-strong);
+}
+
+/* Celda resaltada mientras se arrastra una tarea encima. */
+.calendar__cell--drop-target {
+  border-color: var(--color-primary);
+  box-shadow: inset 0 0 0 2px var(--color-primary);
 }
 
 /* Botón invisible que ocupa toda la celda: cualquier punto del día es clickeable. */
@@ -109,15 +121,17 @@
   width: 1.6rem;
   height: 1.6rem;
   border-radius: 6px;
-  font-size: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
   font-weight: 600;
   line-height: 1;
   color: var(--color-text);
+  transition: background-color 120ms ease, color 120ms ease;
 }
 
 .calendar__cell:hover .calendar__day-number {
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
 }
 
 .calendar__day:focus-visible {
@@ -126,7 +140,7 @@
 
 .calendar__day:focus-visible ~ .calendar__cell-content .calendar__day-number {
   outline: 2px solid var(--color-primary);
-  outline-offset: 1px;
+  outline-offset: 2px;
 }
 
 .calendar__tasks {
@@ -144,23 +158,32 @@
 
 .calendar__task-button {
   pointer-events: auto;
+  cursor: grab;
   display: block;
   width: 100%;
-  padding: 2px 5px;
-  border: none;
-  border-left: 3px solid var(--task-color, var(--color-primary));
-  border-radius: 5px;
-  background: color-mix(in srgb, var(--task-color, var(--color-primary)) 16%, white);
-  color: color-mix(in srgb, var(--task-color, var(--color-primary)) 65%, black);
-  font-size: 0.7rem;
+  padding: 3px 6px;
+  border: 1px solid color-mix(in srgb, var(--task-color, var(--color-muted)) 45%, transparent);
+  border-left: 3px solid var(--task-color, var(--color-muted));
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--task-color, var(--color-muted)) 22%, var(--color-surface-raised));
+  color: color-mix(in srgb, var(--task-color, var(--color-muted)) 45%, var(--color-text));
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.01em;
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: filter 120ms ease, transform 120ms ease;
 }
 
 .calendar__task-button:hover {
-  filter: brightness(0.96);
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.calendar__task-button--dragging {
+  opacity: 0.4;
 }
 
 /* Panel del día */
@@ -168,7 +191,7 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: 1rem 1.25rem;
+  padding: var(--space-3);
   box-shadow: var(--shadow-sm);
 }
 
@@ -176,27 +199,34 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: var(--space-1);
+  margin-bottom: var(--space-1);
 }
 
 .day-panel__title {
   margin: 0;
   font-size: 1rem;
+  font-weight: 500;
   text-transform: capitalize;
 }
 
 .day-panel__add {
   border: none;
   background: var(--color-primary);
-  color: #fff;
-  border-radius: var(--radius-md);
-  padding: 0.4rem 0.7rem;
-  font-size: 0.85rem;
+  color: var(--color-on-primary);
+  border-radius: var(--radius-pill);
+  padding: 0.4rem 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: filter 120ms ease, transform 120ms ease;
 }
 
 .day-panel__add:hover {
   filter: brightness(1.05);
+  transform: translateY(-1px);
 }
 
 .day-panel__empty {
@@ -210,7 +240,7 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-1);
 }
 
 .day-panel__item-button {
@@ -218,24 +248,32 @@
   flex-direction: column;
   gap: 0.15rem;
   width: 100%;
-  padding: 0.5rem 0.6rem;
+  cursor: grab;
+  padding: 0.55rem 0.7rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-surface-raised);
   text-align: left;
+  transition: border-color 120ms ease, background-color 120ms ease, transform 120ms ease;
 }
 
 .day-panel__item-button:hover {
-  border-color: var(--color-primary);
+  border-color: var(--color-border-strong);
   background: var(--color-primary-soft);
+  transform: translateY(-1px);
+}
+
+.day-panel__item-button--dragging {
+  opacity: 0.4;
 }
 
 .day-panel__subject {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--task-color, var(--color-primary));
+  color: color-mix(in srgb, var(--task-color, var(--color-muted)) 55%, var(--color-text));
 }
 
 .day-panel__item-description {
@@ -252,45 +290,57 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: 1rem 1.25rem 1.25rem;
+  padding: var(--space-3);
   box-shadow: var(--shadow-sm);
 }
 
 .task-form__title {
-  margin: 0 0 0.75rem;
+  margin: 0 0 var(--space-2);
   font-size: 1rem;
+  font-weight: 500;
 }
 
 .task-form__field {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--space-2);
 }
 
+/* Etiqueta técnica en mono. */
 .task-form__label {
-  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 12px;
   font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--color-muted);
 }
 
 .task-form__control {
-  padding: 0.5rem 0.6rem;
+  padding: 0.55rem 0.65rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: #fff;
+  background: var(--color-bg);
+  color: var(--color-text);
   font: inherit;
   resize: vertical;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.task-form__control::placeholder {
+  color: var(--color-muted);
 }
 
 .task-form__control:focus {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 1px;
+  outline: none;
   border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
 }
 
 .task-form__control:disabled {
-  background: #f1f2f6;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--color-muted);
   cursor: not-allowed;
 }
 
@@ -305,10 +355,20 @@
 .task-form__submit {
   border: none;
   background: var(--color-primary);
-  color: #fff;
-  border-radius: var(--radius-md);
-  padding: 0.55rem 1rem;
+  color: var(--color-on-primary);
+  border-radius: var(--radius-pill);
+  padding: 0.6rem 1.2rem;
+  font-family: var(--font-mono);
+  font-size: 12px;
   font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: filter 120ms ease, transform 120ms ease, opacity 120ms ease;
+}
+
+.task-form__submit:hover:not(:disabled) {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
 }
 
 .task-form__submit:disabled {
@@ -323,8 +383,10 @@
   z-index: 20;
   display: grid;
   place-items: center;
-  padding: 1rem;
-  background: rgba(15, 23, 42, 0.45);
+  padding: var(--space-2);
+  background: rgba(0, 0, 0, 0.72);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 
 .modal[hidden] {
@@ -333,53 +395,135 @@
 
 .modal__content {
   width: min(480px, 100%);
-  padding: 1.25rem 1.5rem 1.5rem;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  background: #fff;
+  background: var(--color-surface);
   box-shadow: var(--shadow-md);
+  animation: rise 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .modal__title {
-  margin: 0 0 0.5rem;
-  font-size: 1.25rem;
-  color: var(--task-color, var(--color-primary));
+  margin: 0 0 var(--space-1);
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--task-color, var(--color-muted)) 45%, var(--color-text));
 }
 
+/* Etiqueta técnica en mono para la fecha. */
 .modal__date {
-  margin: 0 0 0.75rem;
-  font-size: 0.85rem;
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   color: var(--color-muted);
-  text-transform: capitalize;
+  text-transform: uppercase;
 }
 
 .modal__description {
-  margin: 0 0 1.25rem;
-  line-height: 1.5;
+  margin: 0 0 var(--space-3);
+  line-height: 1.6;
   white-space: pre-wrap;
 }
 
 .modal__actions {
   display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-1);
 }
 
 .modal__delete {
-  border: 1px solid var(--color-danger);
-  background: #fff;
+  margin-right: auto;
+  border: 1px solid color-mix(in srgb, var(--color-danger) 55%, transparent);
+  background: transparent;
   color: var(--color-danger);
   border-radius: var(--radius-md);
-  padding: 0.45rem 0.8rem;
+  padding: 0.45rem 0.85rem;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
 }
 
 .modal__delete:hover {
   background: var(--color-danger);
-  color: #fff;
+  border-color: var(--color-danger);
+  color: var(--color-bg);
+}
+
+.modal__edit,
+.modal__save,
+.modal__cancel,
+.modal__close {
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease,
+    transform 120ms ease;
+}
+
+.modal__edit,
+.modal__save,
+.modal__cancel {
+  border-radius: var(--radius-md);
+  padding: 0.45rem 0.85rem;
+}
+
+.modal__edit {
+  border: 1px solid var(--color-primary);
+  background: transparent;
+  color: var(--color-primary);
+}
+
+.modal__edit:hover {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.modal__save {
+  border: none;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border-radius: var(--radius-pill);
+  padding: 0.5rem 1.1rem;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.modal__save:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.modal__cancel {
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text);
+}
+
+.modal__cancel:hover {
+  background: var(--color-primary-soft);
+  border-color: var(--color-border-strong);
+}
+
+.modal__edit-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal__section[hidden] {
+  display: none;
 }
 
 .modal__close {
   border: 1px solid var(--color-border);
-  background: #fff;
+  background: transparent;
+  color: var(--color-text);
   border-radius: var(--radius-md);
-  padding: 0.45rem 0.8rem;
+  padding: 0.45rem 0.85rem;
+}
+
+.modal__close:hover {
+  background: var(--color-primary-soft);
+  border-color: var(--color-border-strong);
 }

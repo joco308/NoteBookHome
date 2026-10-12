@@ -1,4 +1,5 @@
 import type { TaskRepository } from '../data/taskRepository';
+import { parseIsoDate } from '../domain/date';
 import { createId } from '../domain/id';
 import type { NewTaskInput, Task } from '../domain/task';
 import { validateNewTask, type ValidationIssue } from '../domain/taskValidation';
@@ -10,6 +11,13 @@ export class TaskValidationError extends Error {
     super('La tarea no es válida.');
     this.name = 'TaskValidationError';
     this.issues = issues;
+  }
+}
+
+export class TaskNotFoundError extends Error {
+  public constructor(taskId: string) {
+    super(`No se encontró la tarea con id ${taskId}.`);
+    this.name = 'TaskNotFoundError';
   }
 }
 
@@ -46,6 +54,42 @@ export class TaskService {
     this.tasks = [...this.tasks, task];
     this.commit();
     return task;
+  }
+
+  public update(id: string, input: NewTaskInput): Task {
+    const result = validateNewTask(input);
+    if (!result.valid) {
+      throw new TaskValidationError(result.issues);
+    }
+    const current = this.find(id);
+    if (current === null) {
+      throw new TaskNotFoundError(id);
+    }
+    const updated: Task = {
+      ...current,
+      subject: input.subject.trim(),
+      description: input.description.trim(),
+      date: input.date,
+    };
+    this.tasks = this.tasks.map((task) => (task.id === id ? updated : task));
+    this.commit();
+    return updated;
+  }
+
+  public moveToDate(id: string, isoDate: string): void {
+    if (parseIsoDate(isoDate) === null) {
+      throw new RangeError(`Fecha inválida: ${isoDate}`);
+    }
+    const current = this.find(id);
+    if (current === null) {
+      throw new TaskNotFoundError(id);
+    }
+    if (current.date === isoDate) {
+      return;
+    }
+    const moved: Task = { ...current, date: isoDate };
+    this.tasks = this.tasks.map((task) => (task.id === id ? moved : task));
+    this.commit();
   }
 
   public remove(id: string): void {

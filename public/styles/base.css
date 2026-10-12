@@ -1,28 +1,89 @@
+/*
+ * Tokens de diseño según DESIGN.md ("Vertex Digital Infrastructure").
+ * Paleta oscura monocroma, etiquetas en mono, radios y espaciado explícitos.
+ */
 :root {
-  --color-bg: #f6f7fb;
-  --color-surface: #ffffff;
-  --color-border: #e2e5ee;
-  --color-text: #1f2333;
-  --color-muted: #6b7280;
-  --color-primary: #4f46e5;
-  --color-primary-soft: #eef0ff;
-  --color-danger: #dc2626;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
-  --shadow-md: 0 12px 32px rgba(15, 23, 42, 0.16);
-  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Paleta cruda (DESIGN.md) */
+  --vertex-primary: #000000;
+  --vertex-secondary: #111111;
+  --vertex-accent: #000000;
+  --vertex-background: #111111;
+  --vertex-surface: #191c21;
+  --vertex-text: #ffffff;
+  --vertex-text-secondary: #a1a1aa;
+  --vertex-border: #a1a1aa;
+
+  /* Roles semánticos: fondo, superficie, texto y borde quedan distintos. */
+  --color-bg: var(--vertex-background);
+  --color-surface: var(--vertex-surface);
+  --color-surface-raised: #1f232a;
+  --color-border: rgba(161, 161, 170, 0.22);
+  --color-border-strong: rgba(161, 161, 170, 0.5);
+  --color-text: var(--vertex-text);
+  --color-muted: var(--vertex-text-secondary);
+  /*
+   * Sobre un campo oscuro, el acento interactivo es el blanco (texto primario);
+   * el negro de la paleta se usa como tinta sobre los controles claros.
+   */
+  --color-primary: var(--vertex-text);
+  --color-on-primary: var(--vertex-primary);
+  --color-primary-soft: rgba(255, 255, 255, 0.07);
+  --color-danger: #f87171;
+  --color-danger-soft: rgba(248, 113, 113, 0.12);
+
+  /* Radios (DESIGN.md): card 9px, control 10px, pill. */
+  --radius-card: 9px;
+  --radius-control: 10px;
+  --radius-pill: 9999px;
+  --radius-md: var(--radius-control);
+  --radius-lg: var(--radius-card);
+
+  /* Espaciado (DESIGN.md): base 8px, gap 16px, card-padding 24px. */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+
+  /* Elevación sobre fondo oscuro. */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 24px 64px rgba(0, 0, 0, 0.65);
+
+  /* Tipografía. */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas,
+    'Liberation Mono', monospace;
 }
 
 * {
   box-sizing: border-box;
 }
 
+html {
+  color-scheme: dark;
+}
+
 body {
   margin: 0;
+  min-height: 100vh;
   font-family: var(--font-sans);
-  background: var(--color-bg);
+  font-size: 16px;
+  line-height: 1.6;
+  background-color: var(--color-bg);
   color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Capa ambiental decorativa, sutil y secundaria, detrás del contenido. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(55% 40% at 50% -10%, rgba(255, 255, 255, 0.08), transparent 70%),
+    radial-gradient(40% 35% at 100% 0%, rgba(161, 161, 170, 0.1), transparent 70%),
+    radial-gradient(45% 40% at 0% 100%, rgba(255, 255, 255, 0.05), transparent 70%);
 }
 
 button {
@@ -30,37 +91,89 @@ button {
   cursor: pointer;
 }
 
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 .app-header {
-  padding: 2rem 1.5rem 1rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-2) var(--space-2);
   text-align: center;
 }
 
 .app-title {
   margin: 0;
-  font-size: 1.75rem;
+  font-size: clamp(1.6rem, 4vw, 2rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }
 
+/* Etiqueta técnica en mono. */
 .app-subtitle {
-  margin: 0.25rem 0 0;
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--color-muted);
 }
 
 .app-layout {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  gap: 1.25rem;
+  gap: var(--space-2);
   align-items: start;
   max-width: 1100px;
   margin: 0 auto;
-  padding: 0 1.5rem 3rem;
+  padding: 0 var(--space-2) 64px;
 }
 
 .task-form-host {
   grid-column: 1 / -1;
 }
 
+/* Entrada suave y escalonada de los paneles. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.calendar,
+.day-panel,
+.task-form-host {
+  animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.day-panel {
+  animation-delay: 60ms;
+}
+
+.task-form-host {
+  animation-delay: 120ms;
+}
+
 @media (max-width: 820px) {
   .app-layout {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }

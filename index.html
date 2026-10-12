@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NoteBookHome</title>
+    <link rel="stylesheet" href="/styles/base.css" />
+    <link rel="stylesheet" href="/styles/calendar.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <h1 class="app-title">NoteBookHome</h1>
+      <p class="app-subtitle">Tu calendario de tareas</p>
+    </header>
+
+    <main class="app-layout">
+      <section class="calendar" id="calendar" aria-label="Calendario mensual"></section>
+      <aside class="day-panel" id="day-panel" aria-label="Tareas del día"></aside>
+      <section class="task-form-host" id="task-form" aria-label="Nueva tarea"></section>
+    </main>
+
+    <div class="modal" id="task-dialog" hidden></div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

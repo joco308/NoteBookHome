@@ -74,3 +74,24 @@ If the source includes canvas, WebGL, Three.js, gradients, particles, or atmosph
 - Do not swap the color mode unless the source clearly supports it.
 - Preserve the first viewport signal, focal object, and visual density.
 - Keep buttons, cards, and badges aligned to the same radius and border language.
+
+## Responsive (NoteBookHome)
+La adaptación a pantallas pequeñas no altera la paleta ni la tipografía de origen.
+
+- Breakpoints: `≥1024px` dos columnas (calendario 2fr + panel del día 1fr, formulario a lo ancho);
+  `700–1023px` una columna apilada (calendario → panel → formulario); `<700px` móvil.
+- Densidad fluida con `clamp()`: padding de tarjetas 12–24px, alto de celda 52–84px, y tipografía
+  fluida para los números de día y los chips.
+- Áreas táctiles de al menos 44px en la navegación del mes, "Hoy", "+ Nueva tarea" y las acciones
+  del modal.
+- En móvil el modal entra como hoja inferior (esquinas superiores con el radio de card) y el
+  formulario de alta se abre desde "+ Nueva tarea" en vez de ocupar espacio siempre.
+- Se respetan `env(safe-area-inset-*)` y `prefers-reduced-motion`.
+
+## Interacción de arrastre (NoteBookHome)
+- Mientras se arrastra, el origen se atenúa al 40% y el puntero pasa a `grabbing`.
+- La previsualización (`.drag-ghost`) es una píldora en mono con el color de la materia: borde izquierdo
+  de 3px, fondo mezclado al 22% sobre la superficie y texto mezclado al 45% con el blanco (el mismo
+  tratamiento que el chip del calendario).
+- La celda destino se marca con un anillo interior de 2px en el color de la materia **aclarado al 80%**
+  para conservar presencia sobre el fondo oscuro. Nunca blanco puro ni otro acento.

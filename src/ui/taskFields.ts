@@ -80,6 +80,11 @@ export class TaskFields {
     this.descriptionError.textContent = '';
   }
 
+  /** Lleva el foco al campo Materia sin desplazar la página. */
+  public focusSubject(): void {
+    this.subjectInput.focus({ preventScroll: true });
+  }
+
   public setDisabled(disabled: boolean): void {
     this.subjectInput.disabled = disabled;
     this.descriptionInput.disabled = disabled;

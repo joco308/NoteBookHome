@@ -2,7 +2,6 @@ import { formatLongDate } from '../domain/date';
 import type { Task } from '../domain/task';
 import { createElement } from './dom';
 import { subjectColor } from './subjectColor';
-import { writeTaskId } from './taskDrag';
 
 export interface DayPanelOptions {
   readonly onOpenTask: (taskId: string) => void;
@@ -64,24 +63,23 @@ export class DayPanelView {
 
   private renderItem(task: Task): HTMLElement {
     const item = createElement('li', { className: 'day-panel__item' });
+    const color = subjectColor(task.subject);
     const button = createElement('button', {
       className: 'day-panel__item-button',
-      attributes: { type: 'button', draggable: 'true', 'data-task-id': task.id },
+      attributes: {
+        type: 'button',
+        'data-task-id': task.id,
+        'data-drag-label': task.subject,
+        'data-drag-color': color,
+      },
     });
+    button.style.setProperty('--task-color', color);
 
     const subject = createElement('span', { className: 'day-panel__subject', text: task.subject });
-    subject.style.setProperty('--task-color', subjectColor(task.subject));
 
     button.append(subject, createElement('span', { className: 'day-panel__item-description', text: task.description }));
     button.addEventListener('click', () => {
       this.options.onOpenTask(task.id);
-    });
-    button.addEventListener('dragstart', (event) => {
-      writeTaskId(event, task.id);
-      button.classList.add('day-panel__item-button--dragging');
-    });
-    button.addEventListener('dragend', () => {
-      button.classList.remove('day-panel__item-button--dragging');
     });
     item.append(button);
     return item;

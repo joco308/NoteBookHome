@@ -8,11 +8,20 @@ export interface TaskFormOptions {
   readonly onCreate: (input: NewTaskInput) => void;
 }
 
+/** Clase que hace visible el formulario en móvil (en escritorio siempre se muestra). */
+const OPEN_CLASS = 'task-form-host--open';
+
 export class TaskFormView {
   private date: string | null = null;
 
   private readonly form = createElement('form', { className: 'task-form' });
   private readonly heading = createElement('h2', { className: 'task-form__title', text: 'Selecciona una fecha' });
+  private readonly closeButton = createElement('button', {
+    className: 'task-form__close',
+    text: 'Cerrar',
+    attributes: { type: 'button', 'aria-label': 'Cerrar el formulario de nueva tarea' },
+  });
+  private readonly header = createElement('div', { className: 'task-form__header' });
   private readonly fields = new TaskFields('task-form');
   private readonly statusError = createElement('p', { className: 'task-form__status' });
   private readonly submitButton = createElement('button', {
@@ -25,12 +34,29 @@ export class TaskFormView {
     private readonly root: HTMLElement,
     private readonly options: TaskFormOptions,
   ) {
-    this.form.append(this.heading, this.fields.element, this.submitButton, this.statusError);
+    this.header.append(this.heading, this.closeButton);
+    this.form.append(this.header, this.fields.element, this.submitButton, this.statusError);
     this.form.addEventListener('submit', (event) => {
       this.handleSubmit(event);
     });
+    this.closeButton.addEventListener('click', () => {
+      this.close();
+    });
     this.root.append(this.form);
     this.setDisabled(true);
+  }
+
+  /** Muestra el formulario (en móvil está oculto hasta que se pide crear una tarea). */
+  public open(): void {
+    this.root.classList.add(OPEN_CLASS);
+    this.root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (this.date !== null) {
+      this.fields.focusSubject();
+    }
+  }
+
+  public close(): void {
+    this.root.classList.remove(OPEN_CLASS);
   }
 
   public setDate(isoDate: string): void {

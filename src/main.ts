@@ -4,6 +4,7 @@ import { TaskService } from './services/taskService';
 import { CalendarView } from './ui/calendarView';
 import { DayPanelView } from './ui/dayPanelView';
 import { selectElement } from './ui/dom';
+import { DragController } from './ui/dragController';
 import { TaskDialogView } from './ui/taskDialogView';
 import { TaskFormView } from './ui/taskFormView';
 
@@ -23,18 +24,18 @@ function bootstrap(): void {
     onUpdate: (taskId, input) => service.update(taskId, input),
   });
 
+  const form = new TaskFormView(formRoot, {
+    onCreate: (input) => {
+      service.add(input);
+    },
+  });
+
   const dayPanel = new DayPanelView(dayPanelRoot, {
     onOpenTask: (taskId) => {
       dialog.open(service.find(taskId));
     },
     onCreateRequest: () => {
-      formRoot.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    },
-  });
-
-  const form = new TaskFormView(formRoot, {
-    onCreate: (input) => {
-      service.add(input);
+      form.open();
     },
   });
 
@@ -47,10 +48,16 @@ function bootstrap(): void {
     onOpenTask: (taskId) => {
       dialog.open(service.find(taskId));
     },
-    onMoveTask: (taskId, isoDate) => {
-      service.moveToDate(taskId, isoDate);
+  });
+
+  // Un único controlador de arrastre para los chips del calendario y el panel del día.
+  const dragController = new DragController<string>({
+    resolveTarget: (clientX, clientY) => calendar.resolveDropTarget(clientX, clientY),
+    onDrop: (taskId, target) => {
+      service.moveToDate(taskId, target.value);
     },
   });
+  dragController.attach(document.body);
 
   service.subscribe((tasks) => {
     calendar.setTasks(tasks);
